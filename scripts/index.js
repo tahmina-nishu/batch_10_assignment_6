@@ -66,7 +66,24 @@
                 -> set inner html 
                 -> append the chiild to the container
 
+        16. loading spinner
+            -> get a spinner from daisyUi
+            -> create a div just before the 'all pets' div
+            -> write the spinner code in this div and set a class 'hidden'
+            -> create a function named "loadingSpinner()"
+                -> get the 'spinner' id
+                -> if spinner is true then set the div empty and remove the class 'hidden'
+                    else add the class 'hidden'
+            -> in the functions "loadPets()" & "loadCategoryPets()" set a tiemout function .
+
+        17. Sort By price
+            -> declare a variable named 'pets' and assign it as an empty array
+            -> in "loadPets()" & "loadCategoryPets()" assign the data in 'pets' variable
+            -> create a function named "sortByPrice()"
+                -> sor data & call display functions
+
 */
+let pets = [];      // for sort
 
 const loadCategories = () => {
     //Fetch the data
@@ -95,14 +112,23 @@ const displayCategories = (categories) => {
 }
 
 const loadPets = () => {
+    loadingSpinner(true);
     fetch("https://openapi.programming-hero.com/api/peddy/pets")
     .then((res) => res.json())
-    .then((data) => displayPets(data.pets))
+    .then((data) => {
+        setTimeout (() => {
+            displayPets(data.pets)
+            loadingSpinner(false);
+        },2000)
+
+        pets = data.pets;
+    })
     .catch((error) => console.log(error));
 }
 
 const displayPets = (pets) => {
     console.log(pets);
+
     const petsContainer = document.getElementById('pet-container');
 
     petsContainer.innerHTML = "";
@@ -160,6 +186,7 @@ const displayPets = (pets) => {
 
 const loadCategoryPets = (categoryName) => {
     console.log(categoryName);
+    loadingSpinner(true);
     fetch(`https://openapi.programming-hero.com/api/peddy/category/${categoryName}`)
     .then((res) => res.json())
     .then((datas) => {
@@ -167,7 +194,11 @@ const loadCategoryPets = (categoryName) => {
         const activeButton = document.getElementById(`category-btn-${categoryName}`)
         activeButton.classList.add('activeClass') ;
         
-        displayPets(datas.data)
+        setTimeout (() => {
+            displayPets(datas.data)
+            loadingSpinner(false);
+        },2000)
+        pets = datas.data;
     })
     .catch((error) => console.log(error));
 }
@@ -243,6 +274,26 @@ const addLikedPets = (pet) => {
         <img src="${pet.image}">
         `;
     imageContainer.appendChild(likedPet);
+}
+
+//bonus-1 : loading spinner
+const loadingSpinner = (show) => {
+    const spinner = document.getElementById('spinner');
+
+    if(show){
+        document.getElementById('pet-container').innerHTML = " ";
+        spinner.classList.remove('hidden');
+    }
+    else{
+        spinner.classList.add('hidden');
+    }
+}
+
+//bonus-2 : handle sort button
+const sortByPrice = () => {
+    console.log(pets)
+    const sortedPet = pets.sort((a, b) => b.price - a.price)
+    displayPets(sortedPet);
 }
 
 loadCategories();
