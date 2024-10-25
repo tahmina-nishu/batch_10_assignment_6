@@ -291,9 +291,14 @@ const loadingSpinner = (show) => {
 
 //bonus-2 : Sort by Price
 const sortByPrice = () => {
+    loadingSpinner(true);
     console.log(pets)
     const sortedPet = pets.sort((a, b) => b.price - a.price)
-    displayPets(sortedPet);
+
+    setTimeout (() => {
+        displayPets(sortedPet);
+        loadingSpinner(false);
+        },2000)
 }
 
 //bonus-3 : Adopt Button Behavior
